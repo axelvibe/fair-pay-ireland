@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fair Pay Ireland — Agentic Salary Reality Check</title>
+<style>
+  :root{
+    --ink:#1c2333; --muted:#5b6478; --bg:#f6f7fb; --card:#ffffff;
+    --green:#0f6b3c; --green2:#12874e; --gold:#c9a227; --line:#e3e6ef;
+    --red:#b42318; --amber:#b4690e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);background:
+    radial-gradient(1100px 500px at 90% -10%, rgba(201,162,39,.08), transparent 60%),
+    radial-gradient(800px 450px at -10% 110%, rgba(18,135,78,.07), transparent 60%),
+    var(--bg);line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 18px 80px}
+  header{text-align:center;padding:18px 0 6px}
+  header h1{margin:0;font-size:2.1rem;letter-spacing:-.02em}
+  header h1 .flag{color:var(--green)}
+  header p.tagline{margin:6px 0 0;color:var(--muted);font-size:1.02rem}
+  .pill{display:inline-block;margin-top:12px;padding:5px 14px;border-radius:999px;font-size:.8rem;
+    border:1px solid var(--line);background:#fff;color:var(--muted)}
+  .pill b{color:var(--green)}
+  .pill.err b{color:var(--red)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:22px;
+    box-shadow:0 1px 3px rgba(28,35,51,.05)}
+  section h2{margin:0 0 14px;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+  section h2 .n{display:inline-flex;width:26px;height:26px;border-radius:8px;background:var(--green);color:#fff;
+    align-items:center;justify-content:center;font-size:.85rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin:0 0 5px;text-transform:uppercase;letter-spacing:.04em}
+  select,input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:1rem;background:#fff;color:var(--ink)}
+  select:focus,input:focus{outline:2px solid rgba(18,135,78,.35);border-color:var(--green2)}
+  .runbtn{width:100%;margin-top:18px;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--green),var(--green2));
+    color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;letter-spacing:.01em}
+  .runbtn:disabled{opacity:.6;cursor:wait}
+  .status{margin-top:12px;font-size:.88rem;color:var(--muted);min-height:1.2em;text-align:center}
+  .agent{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 20px 18px;margin-top:22px;overflow:hidden}
+  .agent::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent,#999)}
+  .agent .ah{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .agent .arche{display:inline-block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+    padding:3px 9px;border-radius:999px;color:#fff;background:var(--accent,#999)}
+  .agent h3{margin:0;font-size:1.12rem}
+  .agent .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .agent .data{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 10px}
+  .chip{font-size:.72rem;padding:4px 10px;border-radius:999px;background:#eef3ef;color:var(--green);border:1px solid #d7e4da}
+  .chip.off{background:#f3f4f8;color:var(--muted);border-color:var(--line)}
+  .agent .body{font-size:.95rem;color:var(--ink);white-space:pre-wrap}
+  .agent .handoff{margin-top:12px;padding:9px 12px;border-radius:10px;background:#fbf8ec;border:1px solid #eee3bd;
+    font-size:.82rem;color:#6a5a15}
+  .agent .handoff b{color:var(--gold)}
+  .agent.fail .body{color:var(--red)}
+  .verdict{border:2px solid var(--green2);border-radius:14px;padding:14px 16px;margin-top:14px;background:#f3faf6}
+  .verdict .idx{font-size:2.2rem;font-weight:800;color:var(--green);line-height:1}
+  .verdict .lbl{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .bars{margin-top:12px;display:grid;gap:8px}
+  .bar .bl{display:flex;justify-content:space-between;font-size:.82rem}
+  .bar .track{height:9px;border-radius:999px;background:#e9ecf3;margin-top:3px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green2))}
+  .note{font-size:.8rem;color:var(--muted);margin-top:14px;line-height:1.6}
+  .note code{background:#f0f1f6;padding:1px 6px;border-radius:5px;font-size:.78rem}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:30px}
+  footer a{color:var(--green)}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid #cfd6e2;border-top-color:var(--green);
+    border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:720px){.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+  .arrow{margin:20px auto 0;width:100%;text-align:center;color:var(--gold);font-size:1.1rem;letter-spacing:.3em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1><span class="flag">Fair Pay</span> Ireland</h1>
+    <p class="tagline">Five AI agents answer one honest question: <b>am I paid fairly — and can I afford where I live?</b></p>
+    <div class="pill" id="livepill">Checking live data sources…</div>
+  </header>
+
+  <section id="form">
+    <h2><span class="n">1</span> Your details</h2>
+    <div class="grid2">
+      <div>
+        <label for="sector">Job sector</label>
+        <select id="sector"></select>
+      </div>
+      <div>
+        <label for="county">Where you live (county)</label>
+        <select id="county"></select>
+      </div>
+      <div>
+        <label for="salary">Gross annual salary (€)</label>
+        <input id="salary" type="number" min="0" step="500" placeholder="e.g. 48000">
+      </div>
+      <div>
+        <label for="rent">Monthly rent (€, optional)</label>
+        <input id="rent" type="number" min="0" step="10" placeholder="e.g. 1400">
+      </div>
+      <div>
+        <label for="prev">Last year's salary (€, optional)</label>
+        <input id="prev" type="number" min="0" step="500" placeholder="e.g. 45000">
+      </div>
+      <div>
+        <label for="hours">Weekly hours (optional)</label>
+        <input id="hours" type="number" min="0" step="1" placeholder="e.g. 39">
+      </div>
+    </div>
+    <button class="runbtn" id="run">Run the five-agent pipeline →</button>
+    <div class="status" id="status"></div>
+  </section>
+
+  <div id="pipeline"></div>
+
+  <section>
+    <h2><span class="n">5</span> Live data sources</h2>
+    <p class="note">
+      Every official figure above is fetched at the moment you click <b>Run</b> via <code>fetch()</code> from
+      keyless, CORS-enabled CSO PxStat endpoints — never hardcoded, never cached from a previous session.
+      <br>• <code>EHA05</code> average annual earnings by NACE sector ·
+      <code>CPM02</code>/<code>CPA08</code> Consumer Price Index (All Items, headline inflation) ·
+      <code>RIA02</code> RTB average monthly rent by county ·
+      <code>HPM09</code> Residential Property Price Index by region ·
+      <code>data/profiles.csv</code> synthetic sample profiles (a real queryable file, fetched at runtime).
+      <br>• The Gemini key lives <b>only</b> in the Apps Script proxy's Script Properties — nothing secret is in this repository.
+    </p>
+  </section>
+
+  <footer>
+    An agentic five-agent pipeline · Researcher → Designer → Maker → Communicator → Manager ·
+    <a href="agents/01-researcher.md">agent docs</a> ·
+    built for GitHub Pages
+  </footer>
+</div>
+
+<script src="config.js"></script>
+<script>
+"use strict";
+
+/* =====================================================================
+   CONFIG + state
+   ===================================================================== */
+var CFG = (typeof CONFIG !== "undefined" && CONFIG) ? CONFIG : {};
+var APPS_URL = CFG.APPS_SCRIPT_URL || "";
+var GEMINI_MODEL = CFG.MODEL || "gemini-1.5-flash";
+
+/* =====================================================================
+   LIVE DATA LAYER — CSO PxStat, keyless, CORS-enabled, queried at
+   moment of use. Each fetcher returns null on failure (never throws).
+   Retry with backoff because the CSO API occasionally rate-limits.
+   ===================================================================== */
+var CSO_URL = {
+  EHA05: "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/EHA05/JSON-stat/2.0/en",
+  CPA08: "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/CPA08/JSON-stat/2.0/en",
+  RIA02: "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/RIA02/JSON-stat/2.0/en",
+  HPM09: "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/HPM09/JSON-stat/2.0/en",
+  CPM02: "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/CPM02/JSON-stat/1.0/en%20All%20Items"
+};
+var PROFILES_URL = "data/profiles.csv";
+
+var NACE = {
+  "-": "All NACE economic sectors (national average)",
+  "F": "Construction (F)",
+  "G": "Wholesale and retail trade; repair of motor vehicles (G)",
+  "H": "Transportation and storage (H)",
+  "I": "Accommodation and food service activities (I)",
+  "J": "Information and communication (J)",
+  "M": "Professional, scientific and technical activities (M)",
+  "N": "Administrative and support service activities (N)",
+  "O": "Public administration and defence; compulsory social security (O)",
+  "P": "Education (P)",
+  "Q": "Human health and social work activities (Q)",
+  "Y0900": "Industry (B to E)",
+  "Y3500": "Financial, insurance and real estate activities (K,L)",
+  "Y7400": "Arts, entertainment, recreation and other services (R,S)"
+};
+var COUNTIES = ["Dublin","Cork","Galway","Limerick","Waterford","Kilkenny","Wexford","Wicklow","Kildare",
+  "Meath","Louth","Cavan","Monaghan","Donegal","Sligo","Leitrim","Roscommon","Mayo","Longford",
+  "Westmeath","Offaly","Laois","Tipperary","Clare","Kerry","Carlow"];
+/* county -> HPM09 NUTS3 code */
+var HPM_REGIONS = {
+  "Dublin":"06","Cork":"19","Kerry":"19",
+  "Cavan":"21","Donegal":"21","Leitrim":"21","Monaghan":"21","Sligo":"21",
+  "Laois":"14","Longford":"14","Offaly":"14","Westmeath":"14",
+  "Galway":"15","Mayo":"15","Roscommon":"15",
+  "Kildare":"22","Louth":"22","Meath":"22","Wicklow":"22",
+  "Clare":"23","Limerick":"23","Tipperary":"23",
+  "Carlow":"24","Kilkenny":"24","Waterford":"24","Wexford":"24"
+};
+
+/* --- helpers --- */
+function norm(d){ return (d && d.dataset) ? d.dataset : d; }  /* JSON-stat 1.0 wraps in .dataset */
+function keysOf(o){ return Array.isArray(o) ? o : Object.keys(o || {}); }
+function catList(dim){
+  var c = (dim && dim.category) || {};
+  return { keys: keysOf(c.index), labels: c.label || {} };
+}
+function fmtMoney(n){
+  if (n == null || isNaN(n)) return "–";
+  return "€" + Math.round(n).toLocaleString("en-IE");
+}
+function fmtPct(n){ return (n == null || isNaN(n)) ? "–" : ((n>=0?"+":"") + n.toFixed(1) + "%"); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function fetchJSON(url, tries){
+  tries = tries || 3;
+  return fetch(url, { signal: AbortSignal.timeout(20000) })
+    .then(function(res){
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .catch(function(err){
+      if (tries > 1){
+        return new Promise(function(r){ setTimeout(r, 1200); }).then(function(){ return fetchJSON(url, tries-1); });
+      }
+      return null;
+    });
+}
+
+/* =====================================================================
+   DATASET PARSERS — index into the JSON-stat "value" array using the
+   dimension order reported by the API (id/size), so parsing stays
+   correct even if CSO changes category counts.
+   ===================================================================== */
+function parseEHA05(d){
+  d = norm(d); if (!d || !d.dimension || !d.value) return null;
+  var dims = d.dimension;
+  var statKeys = catList(dims["STATISTIC"]).keys;
+  var naceCat = dims["C02665V03225"];          /* NACE Rev 2 Economic Sector */
+  var empCat  = dims["C02472V02994"];          /* Type of Employment */
+  var yearCat = dims["TLIST(A1)"];
+  var naceKeys = catList(naceCat).keys;
+  var empKeys  = catList(empCat).keys;
+  var yearKeys = catList(yearCat).keys;
+  var N = naceKeys.length, T = empKeys.length, Y = yearKeys.length;
+  var vals = d.value;
+  var iTot = statKeys.indexOf("EHA05C05");     /* Average Total Earnings */
+  var iReg = statKeys.indexOf("EHA05C01");     /* Average Regular Earnings */
+  if (iTot < 0 || iReg < 0 || !Y || !T || !N) return null;
+  var lastY = Y - 1;
+  var allEmp = empKeys.indexOf("-");           /* All employment status */
+  if (allEmp < 0) allEmp = 0;
+  var out = { year: yearKeys[lastY], label: catList(yearCat).labels[yearKeys[lastY]], sectors: {} };
+  function pos(s,y,t,n){ return vals[s*Y*T*N + y*T*N + t*N + n]; }
+  var naceLabels = catList(naceCat).labels;
+  for (var n=0; n<N; n++){
+    out.sectors[naceKeys[n]] = {
+      label: naceLabels[naceKeys[n]],
+      total: pos(iTot, lastY, allEmp, n),
+      regular: pos(iReg, lastY, allEmp, n)
+    };
+  }
+  return out;
+}
+
+function parseCPM02(d){
+  d = norm(d); if (!d || !d.dimension || !d.value) return null;
+  var dims = d.dimension;
+  var monthKeys = catList(dims["TLIST(M1)"]).keys;
+  var monthLabs = catList(dims["TLIST(M1)"]).labels;
+  var baseKeys = catList(dims["C02071V02502"]).keys;
+  var M = monthKeys.length, B = baseKeys.length;
+  if (M < 13 || B < 2) return null;
+  var vals = d.value;
+  var lastM = M - 1, prevM = M - 13;
+  var lastB = B - 1;                            /* latest base period (Dec 2023 = 100) */
+  var cur = vals[lastM*B + lastB], prev = vals[prevM*B + lastB];
+  if (cur == null || prev == null || !prev) return null;
+  return {
+    month: monthLabs[monthKeys[lastM]],
+    index: cur,
+    yoy: 100 * (cur / prev - 1)
+  };
+}
+
+function parseCPA08(d){
+  d = norm(d); if (!d || !d.dimension || !d.value) return null;
+  var dims = d.dimension;
+  var statKeys = catList(dims["STATISTIC"]).keys;
+  var yearKeys = catList(dims["TLIST(A1)"]).keys;
+  var yearLabs = catList(dims["TLIST(A1)"]).labels;
+  var subKeys  = catList(dims["C04624V05409"]).keys;
+  var subLabs  = catList(dims["C04624V05409"]).labels;
+  var S = statKeys.length, Y = yearKeys.length, U = subKeys.length;
+  if (!S || !Y || !U) return null;
+  var vals = d.value;
+  var iPc = statKeys.indexOf("CPA08C07");       /* Percentage Change over 12 months */
+  if (iPc < 0) iPc = S - 1;
+  var lastY = Y - 1;
+  function pos(s,y,u){ return vals[s*Y*U + y*U + u]; }
+  var out = { year: yearKeys[lastY], label: yearLabs[yearKeys[lastY]], cats: {} };
+  for (var u=0; u<U; u++){
+    out.cats[subKeys[u]] = { label: subLabs[subKeys[u]], yoy: pos(iPc, lastY, u) };
+  }
+  return out;
+}
+
+function parseRIA02(d){
+  d = norm(d); if (!d || !d.dimension || !d.value) return null;
+  var dims = d.dimension;
+  var yearKeys = catList(dims["TLIST(A1)"]).keys;
+  var yearLabs = catList(dims["TLIST(A1)"]).labels;
+  var bedKeys  = catList(dims["C02970V03592"]).keys;
+  var ptKeys   = catList(dims["C02969V03591"]).keys;
+  var locKeys  = catList(dims["C03004V03625"]).keys;
+  var locLabs  = catList(dims["C03004V03625"]).labels;
+  var Y = yearKeys.length, B = bedKeys.length, P = ptKeys.length, L = locKeys.length;
+  if (!Y || !B || !P || !L) return null;
+  var vals = d.value;
+  var lastY = Y - 1;
+  var allB = bedKeys.indexOf("All bedrooms"); if (allB < 0) allB = 0;
+  var allP = ptKeys.indexOf("All property types"); if (allP < 0) allP = 0;
+  function pos(y,b,p,l){ return vals[y*B*P*L + b*P*L + p*L + l]; }
+  var out = { year: yearKeys[lastY], label: yearLabs[yearKeys[lastY]], counties: {} };
+  for (var l=0; l<L; l++){
+    var name = locLabs[locKeys[l]];
+    if (!name || name.indexOf(",") >= 0 || name.indexOf("Town") >= 0) continue;
+    out.counties[name] = pos(lastY, allB, allP, l);
+  }
+  return out;
+}
+
+function parseHPM09(d){
+  d = norm(d); if (!d || !d.dimension || !d.value) return null;
+  var dims = d.dimension;
+  var statKeys = catList(dims["STATISTIC"]).keys;
+  var monthKeys = catList(dims["TLIST(M1)"]).keys;
+  var monthLabs = catList(dims["TLIST(M1)"]).labels;
+  var regKeys  = catList(dims["C02803V03373"]).keys;
+  var S = statKeys.length, M = monthKeys.length, R = regKeys.length;
+  if (!S || !M || !R) return null;
+  var vals = d.value;
+  var iYoY = statKeys.indexOf("HPM09C04"); if (iYoY < 0) iYoY = S-1;
+  var lastM = M - 1;
+  var out = { month: monthLabs[monthKeys[lastM]], regions: {} };
+  for (var r=0; r<R; r++){
+    out.regions[regKeys[r]] = vals[iYoY*M*R + lastM*R + r];
+  }
+  return out;
+}
+
+function parseProfiles(csv){
+  if (!csv) return [];
+  var lines = csv.split(/\r?\n/).filter(function(l){ return l && l.trim().length; });
+  var out = [];
+  for (var i=1; i<lines.length; i++){
+    var p = lines[i].split(",");
+    if (p.length < 4) continue;
+    out.push({
+      sector: p[0].trim(), county: p[1].trim(),
+      salary: parseFloat(p[2]), rent: parseFloat(p[3]),
+      note: (p[4]||"").trim()
+    });
+  }
+  return out;
+}
+
+/* =====================================================================
+   LIVE DATA LOADER — fetches everything at query time
+   ===================================================================== */
+var LIVE = null;
+async function loadLive(){
+  var [eha, cpm, cpa, ria, hpm, csv] = await Promise.all([
+    fetchJSON(CSO_URL.EHA05).then(parseEHA05),
+    fetchJSON(CSO_URL.CPM02).then(parseCPM02),
+    fetchJSON(CSO_URL.CPA08).then(parseCPA08),
+    fetchJSON(CSO_URL.RIA02).then(parseRIA02),
+    fetchJSON(CSO_URL.HPM09).then(parseHPM09),
+    fetch(PROFILES_URL, { signal: AbortSignal.timeout(15000) })
+      .then(function(r){ return r.ok ? r.text() : ""; }).catch(function(){ return ""; })
+  ]);
+  LIVE = {
+    earnings: eha, cpi: cpm, cpa: cpa, rents: ria, hpm: hpm,
+    profiles: parseProfiles(csv),
+    fetchedAt: new Date()
+  };
+  return LIVE;
+}
+
+/* =====================================================================
+   SCORING ENGINE — the Maker's "Fair Pay Index" (Designer spec)
+     50 pts  pay vs sector average (EHA05)
+     25 pts  pay vs inflation (CPM02 All-Items CPI YoY)
+     25 pts  rent burden (user rent, or county-average rent scenario)
+   ===================================================================== */
+function computeIndex(inputs){
+  var L = LIVE || {};
+  var e = L.earnings, cpi = L.cpi, rents = L.rents;
+  var sector = e && e.sectors ? (e.sectors[inputs.sector] || e.sectors["-"]) : null;
+  var national = e && e.sectors ? e.sectors["-"] : null;
+  var rentRef = (rents && rents.counties) ? rents.counties[inputs.county] : null;
+
+  var sectorAvg = sector ? sector.total : null;
+  var ratio = (sectorAvg && inputs.salary) ? inputs.salary / sectorAvg : null;
+  /* pay score: 0.70x sector avg -> 0 pts; 1.30x -> 50 pts */
+  var payScore = ratio == null ? null : 50 * clamp01((ratio - 0.7) / 0.6);
+
+  var cpiYoY = cpi ? cpi.yoy : null;
+  var growth = null;
+  if (inputs.prev && inputs.salary) growth = 100 * (inputs.salary / inputs.prev - 1);
+  /* inflation score: growth >= cpi -> 25; growth 5pp below cpi -> 0 */
+  var inflScore = (growth == null || cpiYoY == null) ? null : 25 * clamp01(1 - (cpiYoY - growth) / 5);
+
+  var rentUsed = inputs.rent || (rentRef ? rentRef : null);
+  var burden = (rentUsed && inputs.salary) ? (12 * rentUsed) / inputs.salary : null;
+  /* rent score: burden <= 30% -> 25; 45%+ -> 0 */
+  var rentScore = burden == null ? null : 25 * clamp01((0.45 - burden) / 0.15);
+
+  var comps = [];
+  if (payScore != null) comps.push({ k:"Pay vs sector", v: payScore, max:50 });
+  if (inflScore != null) comps.push({ k:"Pay vs inflation", v: inflScore, max:25 });
+  if (rentScore != null) comps.push({ k:"Rent burden", v: rentScore, max:25 });
+  var total = comps.length ? comps.reduce(function(a,c){ return a+c.v; }, 0) : null;
+
+  return {
+    sectorAvg: sectorAvg, sectorLabel: sector ? sector.label : null,
+    nationalAvg: national ? national.total : null,
+    ratio: ratio, payScore: payScore,
+    cpiYoY: cpiYoY, cpiMonth: cpi ? cpi.month : null,
+    growth: growth, inflScore: inflScore,
+    rentRef: rentRef, rentUsed: rentUsed, burden: burden, rentScore: rentScore,
+    hpmYoY: (L.hpm && L.hpm.regions && HPM_REGIONS[inputs.county]) ? L.hpm.regions[HPM_REGIONS[inputs.county]] : null,
+    hpmMonth: L.hpm ? L.hpm.month : null,
+    rentYear: rents ? rents.label : null,
+    earningsYear: e ? e.label : null,
+    components: comps, total: total
+  };
+}
+function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+
+/* =====================================================================
+   GEMINI HOOK — via Apps Script proxy (key in Script Properties).
+   Falls back to deterministic writers so the pipeline ALWAYS completes.
+   ===================================================================== */
+async function askGemini(system, prompt){
+  if (!APPS_URL) return null;
+  try{
+    var res = await fetch(APPS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ system: system, prompt: prompt, model: GEMINI_MODEL }),
+      signal: AbortSignal.timeout(45000)
+    });
+    if (!res.ok) return null;
+    var j = await res.json();
+    return (j && j.text) ? j.text : null;
+  }catch(e){ return null; }
+}
+
+function dataDigest(i, c){
+  var lines = [
+    "### Live data (queried at " + (LIVE ? LIVE.fetchedAt.toLocaleString("en-IE") : "now") + ")",
+    "",
+    "**Earnings (CSO EHA05, " + (LIVE && LIVE.earnings ? LIVE.earnings.label : "?") + "):**",
+    "- Sector (" + (i.sectorLabel || "?") + "): " + fmtMoney(i.sectorAvg),
+    "- All sectors national average: " + fmtMoney(i.nationalAvg),
+    "- Your salary: " + fmtMoney(i.salary),
+    "- Ratio vs sector average: " + (i.ratio ? (i.ratio*100).toFixed(1) + "%" : "n/a"),
+    "",
+    "**Inflation (CSO CPM02 All Items, " + (i.cpiMonth || "?") + "):** " + fmtPct(i.cpiYoY) + " YoY",
+    i.growth != null ? "- Your salary growth: " + fmtPct(i.growth) : "- (no last-year salary supplied)",
+    "",
+    "**Rent (CSO RIA02 RTB, " + (i.rentYear || "?") + "):**",
+    "- " + i.county + " average monthly rent: " + fmtMoney(i.rentRef),
+    "- Your rent: " + fmtMoney(i.rentUsed) + " → " + (i.burden ? (i.burden*100).toFixed(1) + "% of gross salary" : "n/a"),
+    "",
+    "**Property (CSO HPM09, " + (i.hpmMonth || "?") + "):** " + i.county + " region " + fmtPct(i.hpmYoY) + " YoY",
+    "",
+    "**Fair Pay Index: " + (i.total != null ? Math.round(i.total) + "/100" : "n/a") + "**"
+  ];
+  return lines.join("\n");
+}
+
+/* =====================================================================
+   FIVE AGENTS — system prompts, determinist writers, and the
+   pipeline runner that hands each output to the next agent.
+   ===================================================================== */
+var AGENTS = [
+  {
+    id:"researcher", name:"Researcher", arche:"Researcher", accent:"#0f6b3c", pos:"1 of 5",
+    sub:"Market & labour-data researcher — establishes the ground truth from live official data.",
+    sys: "You are the Researcher of Fair Pay Ireland, a five-agent AI organisation. Personality: analytical, curious, sceptical, detail-obsessed; trusts official statistics over anecdotes. You interrogate live CSO data and write a Research Brief. Every number you cite must come from the live data provided. You never embellish. Output: a concise research brief (headline, the live numbers, the gap, the opportunity). Keep it under 220 words.",
+    write: function(i,c){ return researcherDoc(i,c); }
+  },
+  {
+    id:"designer", name:"Designer", arche:"Designer", accent:"#0b7d5e", pos:"2 of 5",
+    sub:"Solution architect — designs a transparent, defensible comparison methodology.",
+    sys: "You are the Designer of Fair Pay Ireland. Personality: structured, user-empathic, obsessed with honest methodology. You receive the Research Brief and design the Fair Pay Index methodology (50 pts pay vs sector average from EHA05; 25 pts pay vs All-Items CPI inflation from CPM02; 25 pts rent burden vs a 30% threshold, using RIA02 county rents and the user's rent). You define scoring rules, honest framing and the interaction model. Output: a short design spec with the formula, the rules, and how each number is labelled with its live source. Keep it under 220 words.",
+    write: function(i,c){ return designerDoc(i,c); }
+  },
+  {
+    id:"maker", name:"Maker", arche:"Maker", accent:"#b4690e", pos:"3 of 5",
+    sub:"Builder — computes the live Fair Pay Index and renders the working comparison.",
+    sys: "You are the Maker of Fair Pay Ireland. Personality: practical, rigorous, ship-oriented. You receive the Design Spec and produce the computed reality check from the live numbers: the Fair Pay Index out of 100, each component, and a plain-English reading of where the user sits. Every figure must come from the provided live data. Output: the index, the three components, and 2-3 sentences interpreting them. Keep it under 180 words.",
+    write: function(i,c){ return makerDoc(i,c); }
+  },
+  {
+    id:"communicator", name:"Communicator", arche:"Communicator", accent:"#c9a227", pos:"4 of 5",
+    sub:"Marketer — turns the live results into go-to-market material.",
+    sys: "You are the Communicator of Fair Pay Ireland. Personality: persuasive, concise, human. You receive the Maker's live results and write go-to-market material: a value proposition, a homepage headline, two social posts (one LinkedIn, one short), and the verdict in plain English. You never invent numbers; you only restate the live figures provided. Output: value prop, headline+subline, 2 posts, plain-English verdict. Keep it under 230 words.",
+    write: function(i,c){ return communicatorDoc(i,c); }
+  },
+  {
+    id:"manager", name:"Manager", arche:"Manager", accent:"#1c2333", pos:"5 of 5",
+    sub:"Chief of staff — executive summary, key drivers, caveats, next steps.",
+    sys: "You are the Manager of Fair Pay Ireland. Personality: decisive, fair-minded, fluent. You receive all four specialists' outputs and the live results, then produce the Executive Summary: a one-paragraph verdict, the three numbers that most shape it (with live sources), the caveats (sector average ≠ exact role/seniority/region-within-county), and 2-3 concrete next steps. Restate only live, sourced figures. Keep it under 200 words.",
+    write: function(i,c){ return managerDoc(i,c); }
+  }
+];
+
+/* --- deterministic fallback writers (keyless mode) --- */
+function researcherDoc(i,c){
+  return "**Research Brief**\n\n"
+    + "The problem: Irish workers answer “am I paid fairly?” from anecdotes, not official data. The CSO publishes authoritative earnings, inflation, rent and house-price statistics — but they sit in a fragmented government portal nobody opens.\n\n"
+    + "Live evidence (fetched this session):\n"
+    + "- Sector average (" + i.sectorLabel + ", CSO EHA05 " + (i.earningsYear||"") + "): **" + fmtMoney(i.sectorAvg) + "** vs national average **" + fmtMoney(i.nationalAvg) + "**\n"
+    + "- All-Items CPI inflation: **" + fmtPct(i.cpiYoY) + "** YoY (" + (i.cpiMonth||"") + ")\n"
+    + "- " + i.county + " average rent: **" + fmtMoney(i.rentRef) + "**/mo (RTB 2025)\n"
+    + "- " + i.county + " house prices: **" + fmtPct(i.hpmYoY) + "** YoY\n\n"
+    + "The gap: no consumer tool compares your salary against these official figures at the moment you ask. The opportunity: a five-agent reality-check engine that does exactly that. This brief hands to the Designer.";
+}
+
+function designerDoc(i,c){
+  return "**Design Spec — Fair Pay Index**\n\n"
+    + "**Interaction:** user enters sector, county, salary (+ optional rent and last-year salary) → one click runs the pipeline → a single evidence page.\n\n"
+    + "**Methodology (50 / 25 / 25):**\n"
+    + "- Pay vs sector average (50 pts): salary ÷ sector average from EHA05. 0.70× → 0 pts; 1.30× → 50 pts; linear between.\n"
+    + "- Pay vs inflation (25 pts): personal growth vs All-Items CPI (CPM02). Beats CPI → 25 pts; 5 pp below → 0 pts.\n"
+    + "- Rent burden (25 pts): monthly rent × 12 ÷ gross salary. ≤30% → 25 pts; 45%+ → 0 pts. If no rent given, the RIA02 county average is used as a scenario.\n\n"
+    + "**Honest framing:** every headline shows its formula and live-source tag. The tool reports “what the official statistics say”, never a claim of exact market worth.";
+}
+
+function makerDoc(i,c){
+  var comp = (i.components || []).map(function(x){
+    return "- " + x.k + ": " + Math.round(x.v) + "/" + x.max + " → " + pctOf(x.v,x.max);
+  }).join("\n");
+  return "**Maker — computed reality check (live)**\n\n"
+    + "**Fair Pay Index: " + (i.total != null ? Math.round(i.total) : "n/a") + " / 100**\n\n"
+    + "Components:\n" + comp + "\n\n"
+    + "Reading: you earn " + (i.ratio!=null ? (i.ratio*100).toFixed(0) : "–") + "% of the official " + (i.sectorLabel||"sector") + " average (" + fmtMoney(i.sectorAvg) + "). "
+    + "Your pay " + (i.growth!=null && i.cpiYoY!=null ? (i.growth >= i.cpiYoY ? "**kept pace with**" : "**fell behind**") + " inflation (your " + fmtPct(i.growth) + " vs CPI " + fmtPct(i.cpiYoY) + ")" : "is compared against inflation of " + fmtPct(i.cpiYoY) + " (no last-year salary supplied)") + ". "
+    + (i.burden!=null ? "Your rent is **" + (i.burden*100).toFixed(0) + "%** of gross salary" + (i.rentUsed === i.rentRef ? " — in line with the county average" : (i.burden <= 0.30 ? " — under the 30% guideline" : " — above the 30% guideline")) + "." : "Rent burden not computed (no rent or salary supplied).");
+}
+function pctOf(v,max){ return (max ? Math.round(100*v/max) : 0) + "% of score"; }
+
+function communicatorDoc(i,c){
+  var total = i.total != null ? Math.round(i.total) : "n/a";
+  return "**GTM Pack**\n\n"
+    + "**Value proposition:** “Fair Pay Ireland answers one question with official CSO data, live — am I paid fairly, and can I afford where I live?”\n\n"
+    + "**Headline:** “Your salary vs the official numbers.”\n"
+    + "**Subline:** “We fetched the CSO’s sector earnings, inflation, rents and house prices this second — and compared them to your pay.”\n\n"
+    + "**LinkedIn:** “Your Fair Pay Index today: " + total + "/100. Sector average " + i.sectorLabel + " — " + fmtMoney(i.sectorAvg) + ". CPI " + fmtPct(i.cpiYoY) + ". All live, all official. No guesswork.”\n\n"
+    + "**TikTok/IG:** “Am I underpaid? 🚨 3 official numbers, 1 verdict, 0 vibes.”\n\n"
+    + "**Plain-English verdict:** " + (i.total!=null ? (i.total>=70?"Looking strong — you're comfortably above the sector average and your money goes further.": i.total>=45?"You're in the middle — roughly at market, watch the rent burden and inflation.":"The numbers say you're below the official sector average for your area — worth a conversation.") : "Not enough live data to score — try adding your salary and rent.") + " Every figure above is a live CSO stat, re-fetched on every run.";
+}
+
+function managerDoc(i,c){
+  var total = i.total != null ? Math.round(i.total) : "n/a";
+  return "**Executive Summary**\n\n"
+    + "**Verdict:** Your Fair Pay Index is **" + total + "/100**. You earn " + (i.ratio!=null ? (i.ratio*100).toFixed(0)+"%" : "n/a") + " of the " + (i.sectorLabel||"sector") + " average of " + fmtMoney(i.sectorAvg) + " (CSO EHA05 " + (i.earningsYear||"") + "). "
+    + (i.growth!=null ? "Your pay growth (" + fmtPct(i.growth) + ") " + (i.growth >= i.cpiYoY ? "outpaces" : "trails") + " headline inflation of " + fmtPct(i.cpiYoY) + " (CSO CPM02 " + (i.cpiMonth||"") + ")." : "Headline inflation is " + fmtPct(i.cpiYoY) + " (CSO CPM02 " + (i.cpiMonth||"") + "); a last-year salary would sharpen this comparison.") + " "
+    + (i.burden!=null ? "Rent takes **" + (i.burden*100).toFixed(0) + "%** of gross salary (" + (i.rentUsed===i.rentRef?"county-average scenario":fmtMoney(i.rentUsed)) + " vs " + fmtMoney(i.rentRef) + " county average)." : "Rent burden not assessed.") + "\n\n"
+    + "**Key drivers:** 1) sector average " + fmtMoney(i.sectorAvg) + " (EHA05) · 2) CPI " + fmtPct(i.cpiYoY) + " (CPM02) · 3) county rent " + fmtMoney(i.rentRef) + "/mo (RIA02).\n\n"
+    + "**Caveats:** a sector average ≠ your exact role, seniority, company size or neighbourhood. Figures are official, current and sourced — but an average is not a promise.\n\n"
+    + "**Next steps:** (1) benchmark your exact job title against the CSO's finer occupational tables; (2) re-run in ~12 months against a fresh EHA05 year and CPI; (3) use the linked official sources to ground a salary conversation.";
+}
+
+/* =====================================================================
+   PIPELINE RUNNER
+   ===================================================================== */
+function agentCard(ag, output, usedLLM, index){
+  var liveChips = liveChipsFor(ag.id);
+  var body = output || "";
+  var llmTag = usedLLM ? '<span class="chip">Gemini · Apps Script proxy</span>'
+                       : '<span class="chip off">keyless deterministic writer</span>';
+  var handoff = ag.id === "manager"
+    ? '<div class="handoff"><b>Final deliverable:</b> this Executive Summary closes the pipeline.</div>'
+    : '<div class="handoff">Handoff artefact → <b>' + nextAgentName(ag.id) + '</b></div>';
+  return '<section class="agent" style="--accent:' + ag.accent + '">'
+    + '<div class="ah"><span class="arche">' + ag.arche + '</span>'
+    + '<h3>' + ag.name + '</h3><span class="sub">' + ag.sub + ' · pipeline ' + ag.pos + '</span></div>'
+    + '<div class="data">' + liveChips + llmTag + '</div>'
+    + '<div class="body">' + esc(body) + '</div>'
+    + handoff + '</section>';
+}
+function liveChipsFor(id){
+  var L = LIVE || {};
+  var chips = [];
+  if (!L.earnings) chips.push('<span class="chip off">EHA05 unavailable</span>');
+  if (!L.cpi) chips.push('<span class="chip off">CPM02 unavailable</span>');
+  if (!L.rents) chips.push('<span class="chip off">RIA02 unavailable</span>');
+  if (!L.hpm) chips.push('<span class="chip off">HPM09 unavailable</span>');
+  if (id === "researcher" || id === "maker"){
+    if (L.earnings) chips.push('<span class="chip">EHA05 ' + L.earnings.label + ' ✓</span>');
+    if (L.cpi) chips.push('<span class="chip">CPM02 ' + L.cpi.month + ' ✓</span>');
+    if (L.rents) chips.push('<span class="chip">RIA02 ' + L.rents.label + ' ✓</span>');
+    if (L.hpm) chips.push('<span class="chip">HPM09 ' + L.hpm.month + ' ✓</span>');
+    if (L.profiles && L.profiles.length) chips.push('<span class="chip">profiles.csv ' + L.profiles.length + ' rows ✓</span>');
+  }
+  return chips.join("");
+}
+function nextAgentName(id){
+  for (var i=0;i<AGENTS.length-1;i++) if (AGENTS[i].id === id) return AGENTS[i+1].name;
+  return "";
+}
+
+function verdictCard(i){
+  var total = i.total != null ? Math.round(i.total) : null;
+  var grade = total == null ? "not enough data"
+    : total >= 70 ? "Comfortably above market"
+    : total >= 45 ? "Around market — watch the costs"
+    : "Below the official average for your area";
+  var bars = (i.components || []).map(function(x){
+    var pct = x.max ? Math.min(100, 100*x.v/x.max) : 0;
+    return '<div class="bar"><div class="bl"><span>' + x.k + '</span><span>' + Math.round(x.v) + '/' + x.max + '</span></div>'
+      + '<div class="track"><div class="fill" style="width:' + pct + '%"></div></div></div>';
+  }).join("");
+  return '<div class="verdict">'
+    + '<div class="idx">' + (total != null ? total : "–") + '<span style="font-size:1rem;color:var(--muted)">/100</span></div>'
+    + '<div class="lbl">Fair Pay Index · ' + grade + '</div>'
+    + (bars ? '<div class="bars">' + bars + '</div>' : '')
+    + '</div>';
+}
+
+async function runPipeline(){
+  var btn = document.getElementById("run");
+  var status = document.getElementById("status");
+  var out = document.getElementById("pipeline");
+  btn.disabled = true;
+
+  var inputs = {
+    sector: document.getElementById("sector").value,
+    county: document.getElementById("county").value,
+    salary: parseFloat(document.getElementById("salary").value),
+    rent: parseFloat(document.getElementById("rent").value) || null,
+    prev: parseFloat(document.getElementById("prev").value) || null,
+    hours: parseFloat(document.getElementById("hours").value) || null
+  };
+  if (!inputs.salary || inputs.salary <= 0){ status.textContent = "Please enter a gross annual salary first."; btn.disabled = false; return; }
+
+  status.innerHTML = '<span class="spinner"></span>Fetching live CSO data (EHA05, CPM02, CPA08, RIA02, HPM09)…';
+  var L = await loadLive();
+  if (!L.earnings && !L.cpi && !L.rents){
+    status.textContent = "Could not reach the CSO data sources — please check your connection and try again.";
+    btn.disabled = false; return;
+  }
+  setLivePill(L);
+  var idx = computeIndex(inputs);
+  status.innerHTML = '<span class="spinner"></span>Running Researcher → Designer → Maker → Communicator → Manager…';
+  out.innerHTML = "";
+
+  var prevOutput = "";
+  var i = 0;
+  for (const ag of AGENTS){
+    i++;
+    status.innerHTML = '<span class="spinner"></span>Agent ' + i + '/5 — ' + ag.name + '…';
+    var context = dataDigest(idx, inputs);
+    var prompt = context + "\n\n---\n\nPrevious stage output:\n" + (prevOutput || "(none — first stage)") + "\n\n---\n\nYour deliverable:\n";
+    var text = await askGemini(ag.sys, prompt);
+    var usedLLM = !!text;
+    if (!text) text = ag.write(idx, inputs);
+    prevOutput = text;
+    out.insertAdjacentHTML("beforeend", agentCard(ag, text, usedLLM, i));
+    if (ag.id === "maker" && idx.total != null){
+      out.insertAdjacentHTML("beforeend", verdictCard(idx));
+    }
+  }
+  status.innerHTML = "";
+  btn.disabled = false;
+  window.scrollTo({ top: document.getElementById("pipeline").getBoundingClientRect().top + window.scrollY - 10, behavior: "smooth" });
+}
+
+function setLivePill(L){
+  var el = document.getElementById("livepill");
+  var ok = (L.earnings ? 1:0) + (L.cpi?1:0) + (L.rents?1:0) + (L.hpm?1:0);
+  el.innerHTML = ok === 4
+    ? '<b>Live data connected ✓</b> · EHA05, CPM02, CPA08, RIA02, HPM09 fetched this session'
+    : '<b class="err">' + ok + '/4 live sources reached</b> — CSO rate limits? Retry.';
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+function init(){
+  var sec = document.getElementById("sector");
+  Object.keys(NACE).forEach(function(k){
+    var o = document.createElement("option"); o.value = k; o.textContent = NACE[k]; sec.appendChild(o);
+  });
+  var co = document.getElementById("county");
+  COUNTIES.forEach(function(c){
+    var o = document.createElement("option"); o.value = c; o.textContent = c; co.appendChild(o);
+  });
+  document.getElementById("run").addEventListener("click", runPipeline);
+  setLivePill({ earnings:0, cpi:0, rents:0, hpm:0 });
+  /* warm the CPM02/CPA08 cache off-thread? no — we deliberately do NOT
+     prefetch or cache official data; every run fetches fresh. */
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
