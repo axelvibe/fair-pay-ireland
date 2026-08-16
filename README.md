@@ -38,6 +38,9 @@ and hands its deliverable to the next stage (`agents/pipeline.md`). The pipeline
 4. Each agent writes its deliverable — via Gemini through the Apps Script proxy when configured,
    otherwise via a deterministic keyless writer that uses the *same live numbers*. The pipeline always completes.
 5. You see the live data chips, all five handoff cards, and the Fair Pay Index verdict with its component bars.
+6. **Ask an agent:** a chat panel appears below the results — pick any of the five agents and have a conversation.
+   Replies are grounded in the live data digest and that agent's deliverable from the latest run (LLM replies with
+   the proxy configured; a rule-based take otherwise). Each agent keeps its own conversation thread.
 
 ## Assignment gates — how they're met
 

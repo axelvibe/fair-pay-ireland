@@ -69,6 +69,21 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   @media(max-width:720px){.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
   .arrow{margin:20px auto 0;width:100%;text-align:center;color:var(--gold);font-size:1.1rem;letter-spacing:.3em}
+  .chatagentpick{margin-bottom:10px}
+  .chatbox{height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfbfd;
+    display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:82%;padding:9px 13px;border-radius:14px;font-size:.92rem;white-space:pre-wrap}
+  .msg.user{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:4px}
+  .msg.agent{align-self:flex-start;background:#eef3ef;border:1px solid #d7e4da;border-bottom-left-radius:4px;color:var(--ink)}
+  .msg.typing{align-self:flex-start;color:var(--muted);font-style:italic;border:none;background:transparent}
+  .chat-input-row{display:flex;gap:10px;margin-top:10px}
+  .chat-input-row input{flex:1}
+  .sendbtn{padding:10px 22px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));
+    color:#fff;font-weight:700;cursor:pointer}
+  .sendbtn:disabled{opacity:.5;cursor:not-allowed}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .qchip{font-size:.78rem;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--green);cursor:pointer}
+  .qchip:hover{border-color:var(--green2);background:#f0f7f2}
 </style>
 </head>
 <body>
@@ -114,6 +129,23 @@
 
   <div id="pipeline"></div>
 
+  <section id="chat" style="display:none">
+    <h2><span class="n">4</span> Ask an agent</h2>
+    <p class="note">Chat with any of the five agents about this run. Replies are grounded in the live CSO data and that
+      agent's deliverable from the run above. With the Apps Script Gemini proxy configured, you get real LLM answers;
+      without it you get the agent's rule-based take.</p>
+    <div class="chatagentpick">
+      <label for="chatagent">Talk to</label>
+      <select id="chatagent"></select>
+    </div>
+    <div class="chatbox" id="chatbox"></div>
+    <div class="chat-input-row">
+      <input id="chatinput" type="text" placeholder="e.g. Why is my pay score only 18 out of 50?" autocomplete="off">
+      <button class="sendbtn" id="chatsend">Send</button>
+    </div>
+    <div class="chips" id="chatpresets"></div>
+  </section>
+
   <section>
     <h2><span class="n">5</span> Live data sources</h2>
     <p class="note">
@@ -145,6 +177,24 @@
 var CFG = (typeof CONFIG !== "undefined" && CONFIG) ? CONFIG : {};
 var APPS_URL = CFG.APPS_SCRIPT_URL || "";
 var GEMINI_MODEL = CFG.MODEL || "gemini-1.5-flash";
+
+/* --- chat state: the latest run's context + one conversation per agent --- */
+var lastRun = null;
+var chatHistories = {};
+var CHAT_MAX_TURNS = 4;   /* keep the last 4 user+agent turns in memory */
+var PRESETS = {
+  researcher: ["What's the single biggest gap between my pay and the sector average?",
+               "Which of these official datasets should I trust most?"],
+  designer:   ["Why is the pay-vs-sector component worth 50 points?",
+               "How do you stop an unfair comparison?"],
+  maker:      ["Why is my Fair Pay Index what it is?",
+               "What would raise my score the most?"],
+  communicator: ["Give me a short social post about my result.",
+                 "What's the one-line verdict?"],
+  manager:    ["What's the most honest caveat about my result?",
+               "What should I do next?"]
+};
+
 
 /* =====================================================================
    LIVE DATA LAYER — CSO PxStat, keyless, CORS-enabled, queried at
@@ -431,6 +481,102 @@ function computeIndex(inputs){
 function clamp01(x){ return Math.max(0, Math.min(1, x)); }
 
 /* =====================================================================
+   CHAT — talk to any of the five agents, grounded in the latest run.
+   ===================================================================== */
+function renderChat(s){ return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
+function chatAgent(){
+  var sel = document.getElementById("chatagent");
+  for (var i=0;i<AGENTS.length;i++) if (AGENTS[i].id === sel.value) return AGENTS[i];
+  return null;
+}
+function runContextFor(ag){
+  if (!lastRun) return "No pipeline run has happened yet in this session.";
+  var parts = ["LIVE DATA DIGEST FROM THE LATEST RUN:\n" + lastRun.digest];
+  if (lastRun.deliverables && lastRun.deliverables[ag.id]){
+    parts.push("YOUR OWN DELIVERABLE FROM THE LATEST RUN (stay consistent with it unless asked otherwise):\n"
+      + lastRun.deliverables[ag.id]);
+  }
+  return parts.join("\n\n");
+}
+function buildChatPrompt(text, hist){
+  var lines = ["Conversation so far:"];
+  var start = Math.max(0, hist.length - CHAT_MAX_TURNS * 2);
+  for (var i = start; i < hist.length; i++){
+    lines.push((hist[i].role === "user" ? "User" : "You") + ": " + hist[i].content);
+  }
+  lines.push("User: " + text);
+  lines.push("Answer as the " + (chatAgent() ? chatAgent().name : "agent") + ". Reply directly, using only the live figures given. Keep it under 160 words.");
+  return lines.join("\n");
+}
+function keylessChatReply(ag, text){
+  var snippet = "";
+  if (lastRun && lastRun.deliverables && lastRun.deliverables[ag.id]){
+    snippet = "\n\nFor reference, this run's deliverable:\n\n" + lastRun.deliverables[ag.id];
+  } else {
+    snippet = "\n\nRun the pipeline once so I have live data to discuss.";
+  }
+  return "**" + ag.name + " — keyless deterministic mode.** A full LLM conversation needs the Apps Script Gemini proxy (paste your /exec URL into config.js — see README). "
+    + "Here's my rule-based take on \"" + text + "\" from the latest run:" + snippet;
+}
+var chatTyping = null;
+function appendMsg(box, html, cls){
+  var div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerHTML = html;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+function showTyping(box, name){
+  chatTyping = appendMsg(box, esc(name + " is thinking…"), "typing");
+}
+function clearTyping(box){
+  if (chatTyping && chatTyping.parentNode === box) box.removeChild(chatTyping);
+  chatTyping = null;
+}
+function setPresets(agentId){
+  var el = document.getElementById("chatpresets");
+  el.innerHTML = "";
+  (PRESETS[agentId] || []).forEach(function(q){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "qchip"; b.textContent = q;
+    b.addEventListener("click", function(){
+      document.getElementById("chatinput").value = q;
+      sendChat();
+    });
+    el.appendChild(b);
+  });
+}
+async function sendChat(){
+  var input = document.getElementById("chatinput");
+  var box = document.getElementById("chatbox");
+  var send = document.getElementById("chatsend");
+  var ag = chatAgent();
+  var text = (input.value || "").trim();
+  if (!ag || !text) return;
+  input.value = "";
+  appendMsg(box, esc(text), "user");
+  send.disabled = true;
+
+  var hist = chatHistories[ag.id] || (chatHistories[ag.id] = []);
+  hist.push({ role: "user", content: text });
+  showTyping(box, ag.name);
+
+  var reply = null;
+  if (APPS_URL){
+    reply = await askGemini(ag.sys + "\n\n" + runContextFor(ag), buildChatPrompt(text, hist));
+  }
+  if (!reply) reply = keylessChatReply(ag, text);
+
+  clearTyping(box);
+  appendMsg(box, renderChat(reply), "agent");
+  hist.push({ role: "agent", content: reply });
+  if (hist.length > CHAT_MAX_TURNS * 2) hist.splice(0, hist.length - CHAT_MAX_TURNS * 2);
+  send.disabled = false;
+  box.scrollTop = box.scrollHeight;
+}
+
+/* =====================================================================
    GEMINI HOOK — via Apps Script proxy (key in Script Properties).
    Falls back to deterministic writers so the pipeline ALWAYS completes.
    ===================================================================== */
@@ -652,6 +798,7 @@ async function runPipeline(){
   out.innerHTML = "";
 
   var prevOutput = "";
+  var deliverables = {};
   var i = 0;
   for (const ag of AGENTS){
     i++;
@@ -661,12 +808,19 @@ async function runPipeline(){
     var text = await askGemini(ag.sys, prompt);
     var usedLLM = !!text;
     if (!text) text = ag.write(idx, inputs);
+    deliverables[ag.id] = text;
     prevOutput = text;
     out.insertAdjacentHTML("beforeend", agentCard(ag, text, usedLLM, i));
     if (ag.id === "maker" && idx.total != null){
       out.insertAdjacentHTML("beforeend", verdictCard(idx));
     }
   }
+  lastRun = { digest: dataDigest(idx, inputs), deliverables: deliverables, inputs: inputs, index: idx };
+  chatHistories = {};
+  var chatSec = document.getElementById("chat");
+  if (chatSec) chatSec.style.display = "";
+  var chatSel = document.getElementById("chatagent");
+  if (chatSel) setPresets(chatSel.value);
   status.innerHTML = "";
   btn.disabled = false;
   window.scrollTo({ top: document.getElementById("pipeline").getBoundingClientRect().top + window.scrollY - 10, behavior: "smooth" });
@@ -693,6 +847,14 @@ function init(){
     var o = document.createElement("option"); o.value = c; o.textContent = c; co.appendChild(o);
   });
   document.getElementById("run").addEventListener("click", runPipeline);
+  var chatSel = document.getElementById("chatagent");
+  AGENTS.forEach(function(a){
+    var o = document.createElement("option"); o.value = a.id; o.textContent = a.name + " — " + a.arche; chatSel.appendChild(o);
+  });
+  chatSel.addEventListener("change", function(){ setPresets(chatSel.value); });
+  setPresets(chatSel.value);
+  document.getElementById("chatsend").addEventListener("click", sendChat);
+  document.getElementById("chatinput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendChat(); });
   setLivePill({ earnings:0, cpi:0, rents:0, hpm:0 });
   /* warm the CPM02/CPA08 cache off-thread? no — we deliberately do NOT
      prefetch or cache official data; every run fetches fresh. */
