@@ -27,6 +27,18 @@ function setKey(key) {
   PropertiesService.getScriptProperties().setProperty(KEY_PROP, key);
 }
 
+/**
+ * Easiest way to store your key (works in every Apps Script UI version):
+ *  1. Replace PASTE_YOUR_GEMINI_API_KEY_HERE with your real key below.
+ *  2. In the toolbar at the top of the Editor, make sure the function
+ *     dropdown says "configure", then press the Run ▶ button.
+ *  3. Authorise when asked, then delete the key from this line again
+ *     (it is now stored safely in Script Properties).
+ */
+function configure() {
+  setKey('PASTE_YOUR_GEMINI_API_KEY_HERE');
+}
+
 function doGet() {
   return json_({ help: HELPTEXT, keySet: !!PropertiesService.getScriptProperties().getProperty(KEY_PROP) });
 }
