@@ -9,7 +9,7 @@
  * writes every agent deliverable deterministically from live CSO data.
  */
 var CONFIG = {
-  APPS_SCRIPT_URL: "",
-  MODEL: "gemini-1.5-flash",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzh_yqN37xNHTxBRzUgKQtWYlXa2glfy38jxz6cy1XN75Yip4DnN_frJL_aNbuwHGAGcQ/exec",
+  MODEL: "gemini-2.5-flash",
   SITE: "https://axelvibe.github.io/fair-pay-ireland/"
 };

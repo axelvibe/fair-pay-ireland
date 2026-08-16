@@ -19,7 +19,7 @@
  * sends a plain POST (Content-Type: text/plain) to avoid preflight.
  */
 
-var MODEL = 'gemini-1.5-flash';
+var MODEL = 'gemini-2.5-flash';
 var KEY_PROP = 'GEMINI_API_KEY';
 var HELPTEXT = 'Fair Pay Ireland proxy. POST {"system": "...", "prompt": "..."} and get back {"text": "..."}';
 
